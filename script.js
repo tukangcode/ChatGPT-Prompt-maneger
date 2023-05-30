@@ -1,16 +1,16 @@
 // ==UserScript==
 // @name         Chatgpt Prompt Manager and loader
 // @namespace    http://tampermonkey.net/
-// @version      1.9
+// @version      2.5
 // @description  Improve version of ChatGPT Notepad With ability to browse and load prompt easily
 // @author       TukangCode
 // @match        https://chat.openai.com/*
-// @grant        none
-// @license      GPL 3.0
+// @grant        GM_download
+// @require      https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js
+// @license      GPL3
 // ==/UserScript==
 
 // Use it wisely
-
 (function() {
   'use strict';
 
@@ -141,33 +141,21 @@
   newDiv.appendChild(loadButton);
 
   // Create the export button
-  var exportButton = document.createElement("button");
-  exportButton.textContent = "Export";
-  exportButton.style.backgroundColor = "#333"; // Dark background
-  exportButton.style.color = "white"; // White text
-  exportButton.style.marginTop = "10px"; // Add space below the buttons
-  exportButton.style.marginRight = "5px"; // Add right margin
-  exportButton.style.float = "right"; // Align right
-  exportButton.onclick = function() {
-    var allNotes = "";
-    for (var k = 0; k < textWindows.length; k++) {
-      var title = textWindows[k].querySelector("input").value;
-      var content = textWindows[k].querySelector("textarea").value;
-      allNotes += title + "\n\n" + content + "\n\n";
-    }
-    var textarea = document.createElement("textarea");
-    textarea.value = allNotes;
+var exportButton = document.createElement("button");
+exportButton.textContent = "Export";
+exportButton.style.backgroundColor = "#333"; // Dark background
+exportButton.style.color = "white"; // White text
+exportButton.style.marginTop = "10px"; // Add space below the buttons
+exportButton.style.marginRight = "5px"; // Add right margin
+exportButton.style.float = "right"; // Align right
+exportButton.onclick = function() {
+  var currentWindow = textWindows[currentIndex];
+  var title = currentWindow.querySelector("input").value;
+  var content = currentWindow.querySelector("textarea").value;
 
-    // Create a temporary container element
-    var tempContainer = document.createElement("div");
-    tempContainer.appendChild(textarea);
-
-    // Copy the content of the textarea to the clipboard
-    textarea.select();
-    document.execCommand("copy");
-
-    alert("All notes have been copied to the clipboard!");
-  };
+  var blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+  saveAs(blob, title + ".txt");
+};
 
   newDiv.appendChild(exportButton);
 
